@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Controle financeiro responsivo com Flask e SQLite." />
+    <meta name="theme-color" content="#0A122A" />
+    <title>{{ page_title }} — Controle Financeiro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegação principal">
+        <a class="brand" href="{{ url_for('dashboard') }}" aria-label="Saldo - início">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><path d="M7 10.5h18M7 16h12M7 21.5h18" /><circle cx="23" cy="16" r="3" /></svg>
+          </span>
+          <span>saldo<span class="brand-dot">.</span></span>
+        </a>
+
+        <nav class="nav-list">
+          <a class="nav-item {{ 'is-active' if active_page == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z" /></svg>
+            <span>Dashboard</span>
+          </a>
+          <a class="nav-item {{ 'is-active' if active_page == 'cadastro' else '' }}" href="{{ url_for('cadastro') }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            <span>Cadastro</span>
+          </a>
+          <a class="nav-item {{ 'is-active' if active_page == 'lista' else '' }}" href="{{ url_for('lista') }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14M5 12h14M5 19h14M3 5h.01M3 12h.01M3 19h.01" /></svg>
+            <span>Movimentações</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-card"><span class="sidebar-card-icon" aria-hidden="true">✦</span><p>Organize hoje.<br /><strong>Respire amanhã.</strong></p></div>
+        <div class="sidebar-footer"><span class="status-dot" aria-hidden="true"></span> Dados salvos no SQLite</div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div><p class="eyebrow">CONTROLE FINANCEIRO</p><h1>{{ page_title }}</h1></div>
+          {% if active_page != 'cadastro' %}
+          <a class="button button-primary topbar-action" href="{{ url_for('cadastro') }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            <span>Nova movimentação</span>
+          </a>
+          {% endif %}
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-stack" aria-live="polite">
+              {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
