@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="form-page">
+  <article class="panel form-card">
+    <div class="panel-heading"><div><p class="panel-kicker">{{ 'EDIÇÃO' if editing else 'NOVA MOVIMENTAÇÃO' }}</p><h2>{{ 'Atualize os dados' if editing else 'Registre uma receita ou despesa' }}</h2></div></div>
+    <form method="post" id="transaction-form" novalidate>
+      <fieldset class="type-selector">
+        <legend>Tipo da movimentação</legend>
+        <label><input type="radio" name="tipo" value="receita" {{ 'checked' if form_data.get('tipo', 'receita') == 'receita' else '' }} /><span><i class="type-symbol">＋</i> Receita</span></label>
+        <label><input type="radio" name="tipo" value="despesa" {{ 'checked' if form_data.get('tipo') == 'despesa' else '' }} /><span><i class="type-symbol">−</i> Despesa</span></label>
+      </fieldset>
+
+      <div class="form-field full-width"><label for="descricao">Descrição</label><input id="descricao" name="descricao" type="text" maxlength="60" value="{{ form_data.get('descricao', '') }}" placeholder="Ex.: Salário, aluguel, mercado" required /></div>
+      <div class="form-grid">
+        <div class="form-field"><label for="valor">Valor</label><div class="currency-input"><span>R$</span><input id="valor" name="valor" type="text" inputmode="decimal" value="{{ form_data.get('valor', '') }}" placeholder="0,00" required /></div><small class="field-error" id="amount-error"></small></div>
+        <div class="form-field"><label for="data">Data</label><input id="data" name="data" type="date" value="{{ form_data.get('data', '') }}" required /></div>
+      </div>
+      <div class="form-field full-width"><label for="categoria">Categoria</label><select id="categoria" name="categoria" data-selected="{{ form_data.get('categoria', '') }}" required></select></div>
+      <div class="form-actions"><a class="button button-ghost" href="{{ url_for('lista') if editing else url_for('dashboard') }}">Cancelar</a><button class="button button-primary" type="submit">{{ 'Salvar alterações' if editing else 'Salvar movimentação' }}</button></div>
+    </form>
+  </article>
+  <aside class="panel form-help"><p class="panel-kicker">COMO FUNCIONA</p><h2>CRUD com banco de dados</h2><p>Cada movimentação é gravada no SQLite pelo Flask. A lista permite consultar, filtrar, editar e excluir registros persistidos.</p><div class="help-badge">SQLite + Flask</div></aside>
+</section>
+<script id="categories-data" type="application/json">{{ categories|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/cadastro.js') }}"></script>{% endblock %}
