@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-content">
+  <div class="section-heading"><div><p class="eyebrow">HISTÓRICO COMPLETO</p><h2>Suas movimentações</h2></div><span class="result-count">{{ transactions|length }} resultado{{ '' if transactions|length == 1 else 's' }}</span></div>
+  <form class="filter-panel" method="get" autocomplete="off">
+    <label class="search-field"><span class="sr-only">Buscar</span><input name="busca" type="search" value="{{ filters.busca }}" placeholder="Buscar movimentação..." /></label>
+    <label><span class="sr-only">Tipo</span><select name="tipo"><option value="todos" {{ 'selected' if filters.tipo == 'todos' else '' }}>Todos os tipos</option><option value="receita" {{ 'selected' if filters.tipo == 'receita' else '' }}>Receitas</option><option value="despesa" {{ 'selected' if filters.tipo == 'despesa' else '' }}>Despesas</option></select></label>
+    <label><span class="sr-only">Categoria</span><select name="categoria"><option value="todas">Todas as categorias</option>{% for cat in categories %}<option value="{{ cat }}" {{ 'selected' if filters.categoria == cat else '' }}>{{ cat }}</option>{% endfor %}</select></label>
+    <label><span class="sr-only">Mês</span><input name="mes" type="month" value="{{ filters.mes }}" /></label>
+    <div class="filter-actions"><button class="button button-secondary" type="submit">Filtrar</button><a class="button button-ghost" href="{{ url_for('lista') }}">Limpar</a></div>
+  </form>
+
+  <article class="panel transactions-panel">
+    {% if transactions %}
+    <div class="table-wrap"><table><thead><tr><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Data</th><th class="align-right">Valor</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody>
+      {% for item in transactions %}
+      <tr>
+        <td><div class="transaction-name"><span class="category-icon">{{ '＋' if item.tipo == 'receita' else '−' }}</span><span>{{ item.descricao }}</span></div></td>
+        <td data-label="Tipo"><span class="type-badge {{ 'income' if item.tipo == 'receita' else 'expense' }}">{{ item.tipo|capitalize }}</span></td>
+        <td data-label="Categoria">{{ item.categoria }}</td><td data-label="Data">{{ item.data|date_br }}</td>
+        <td class="align-right" data-label="Valor"><span class="amount {{ 'income' if item.tipo == 'receita' else 'expense' }}">{{ '+' if item.tipo == 'receita' else '−' }} {{ item.valor|brl }}</span></td>
+        <td><div class="row-actions"><a class="icon-button" href="{{ url_for('editar', transaction_id=item.id) }}" aria-label="Editar {{ item.descricao }}">✎</a><form method="post" action="{{ url_for('excluir', transaction_id=item.id) }}" class="inline-form" data-delete-form><button class="icon-button delete" type="submit" aria-label="Excluir {{ item.descricao }}">⌫</button></form></div></td>
+      </tr>
+      {% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty-state"><span>⌁</span><h3>Nenhum resultado encontrado</h3><p>Ajuste os filtros ou cadastre uma nova movimentação.</p><a class="button button-secondary" href="{{ url_for('cadastro') }}">Nova movimentação</a></div>{% endif %}
+  </article>
+</section>
+{% endblock %}
