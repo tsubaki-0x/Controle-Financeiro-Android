@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-content">
+  <div class="hero-balance">
+    <div class="hero-copy">
+      <span class="hero-label">Saldo disponível</span>
+      <strong class="hero-value">{{ saldo|brl }}</strong>
+      <span class="balance-status {{ 'negative' if saldo < 0 else '' }}">{{ 'Despesas acima das receitas' if saldo < 0 else 'Seu resultado financeiro atual' }}</span>
+    </div>
+    <div class="hero-actions" aria-label="Ações rápidas">
+      <a class="quick-action" href="{{ url_for('cadastro', tipo='receita') }}"><span class="quick-icon income" aria-hidden="true">＋</span><span><small>Adicionar</small>Receita</span></a>
+      <a class="quick-action" href="{{ url_for('cadastro', tipo='despesa') }}"><span class="quick-icon expense" aria-hidden="true">−</span><span><small>Adicionar</small>Despesa</span></a>
+    </div>
+    <div class="hero-orbit" aria-hidden="true"></div>
+  </div>
+
+  <div class="metric-grid" aria-label="Resumo financeiro">
+    <article class="metric-card"><div class="metric-heading"><span>Receitas</span><span class="metric-icon income">↗</span></div><strong>{{ receitas|brl }}</strong><span class="metric-caption">{{ income_count }} {{ 'movimentação' if income_count == 1 else 'movimentações' }}</span></article>
+    <article class="metric-card"><div class="metric-heading"><span>Despesas</span><span class="metric-icon expense">↙</span></div><strong>{{ despesas|brl }}</strong><span class="metric-caption">{{ expense_count }} {{ 'movimentação' if expense_count == 1 else 'movimentações' }}</span></article>
+    <article class="metric-card economy-card"><div class="metric-heading"><span>Taxa de economia</span><span class="metric-icon neutral">%</span></div><strong>{{ taxa_economia }}%</strong><span class="metric-caption">do total recebido</span></article>
+  </div>
+
+  <div class="analytics-grid">
+    <article class="panel flow-panel">
+      <div class="panel-heading"><div><p class="panel-kicker">ÚLTIMOS 6 MESES</p><h2>Fluxo financeiro</h2></div><div class="chart-legend"><span><i class="legend-dot income"></i>Receitas</span><span><i class="legend-dot expense"></i>Despesas</span></div></div>
+      <div class="bar-chart" id="bar-chart" role="img" aria-label="Comparação mensal entre receitas e despesas"></div>
+    </article>
+    <article class="panel category-panel">
+      <div class="panel-heading"><div><p class="panel-kicker">DISTRIBUIÇÃO</p><h2>Despesas por categoria</h2></div></div>
+      <div class="donut-layout"><div class="donut" id="category-donut"><div class="donut-center"><span>Total</span><strong id="donut-total">R$ 0</strong></div></div><div class="category-legend" id="category-legend"></div></div>
+    </article>
+  </div>
+
+  <article class="panel recent-panel">
+    <div class="panel-heading"><div><p class="panel-kicker">ATIVIDADE</p><h2>Movimentações recentes</h2></div><a class="text-button" href="{{ url_for('lista') }}">Ver todas →</a></div>
+    {% if recent %}
+    <div class="table-wrap"><table><thead><tr><th>Descrição</th><th>Categoria</th><th>Data</th><th class="align-right">Valor</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody>
+      {% for item in recent %}
+      <tr><td><div class="transaction-name"><span class="category-icon">{{ '＋' if item.tipo == 'receita' else '−' }}</span><span>{{ item.descricao }}</span></div></td><td data-label="Categoria">{{ item.categoria }}</td><td data-label="Data">{{ item.data|date_br }}</td><td class="align-right" data-label="Valor"><span class="amount {{ 'income' if item.tipo == 'receita' else 'expense' }}">{{ '+' if item.tipo == 'receita' else '−' }} {{ item.valor|brl }}</span></td><td><div class="row-actions"><a class="icon-button" href="{{ url_for('editar', transaction_id=item.id) }}" aria-label="Editar">✎</a></div></td></tr>
+      {% endfor %}
+    </tbody></table></div>
+    {% else %}
+    <div class="empty-state"><span>＋</span><h3>Nenhuma movimentação ainda</h3><p>Cadastre uma receita ou despesa para começar.</p><a class="button button-secondary" href="{{ url_for('cadastro') }}">Cadastrar agora</a></div>
+    {% endif %}
+  </article>
+</section>
+<script id="monthly-data" type="application/json">{{ monthly_data|tojson }}</script>
+<script id="category-data" type="application/json">{{ category_data|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>{% endblock %}
